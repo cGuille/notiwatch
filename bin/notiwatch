@@ -1,0 +1,48 @@
+#!/usr/bin/env node
+
+'use strict';
+
+var fs = require('fs');
+var filePath = process.argv.slice(2).join(' ');
+
+if (!filePath) {
+    console.error("Usage: " + process.argv[1] + " [file path]");
+    process.exit(1);
+}
+
+if (!fs.existsSync(filePath)) {
+    console.error("The file '" + filePath + "' does not exist.");
+    process.exit(1);
+}
+
+var Tail = require('tail').Tail;
+var growl = require('notify-send');
+
+var notifySend = growl.notify.bind(growl);
+var notifyStub = function () {};
+
+var notify = notifySend;
+
+var tail = new Tail(filePath);
+
+tail.on('line', function (data) {
+    console.log(data);
+    notify(filePath, data.substr(0, 50));
+    notify = notifyStub;
+    planNotifyReset();
+});
+
+tail.on('error', function (error) {
+    console.error('ERROR:', error.message);
+});
+
+var timer;
+function planNotifyReset() {
+    if (timer) {
+        return;
+    }
+    timer = setTimeout(function () {
+        notify = notifySend;
+        timer = null;
+    }, 5000);
+}
