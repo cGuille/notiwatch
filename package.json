@@ -2,7 +2,7 @@
   "name": "notiwatch",
   "version": "0.0.1",
   "description": "Watch a file and send a notification when there are new data in this file.",
-  "main": "bin/notiwatch",
+  "bin": "bin/notiwatch",
   "repository": {
     "type": "git",
     "url": "git@github.com:cGuille/notiwatch.git"
